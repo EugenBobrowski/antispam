@@ -17,12 +17,15 @@ class Antispam
 {
 
     protected static $instance;
-    private $nonce = 'mfmfllfsdjgh';
+    private $nonce;
 
     private function __construct()
     {
         if (is_admin()) return false;
 //		add_filter('pre_comment_on_post', array($this, 'verify_spam'));
+
+        $this->nonce = hash('md5', ABSPATH);
+
         add_filter('init', array($this, 'verify_spam'));
         add_filter('comment_form_fields', array($this, 'add_real_comment_field'));
         add_filter('print_footer_scripts', array($this, 'javascript'));
