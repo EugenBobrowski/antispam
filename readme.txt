@@ -16,6 +16,8 @@ Features include:
 
 * No captcha
 
+GitHub: https://github.com/EugenBobrowski/antispam
+
 == Installation ==
 
 Upload the Antispam plugin to your blog, Activate it, then use it.
