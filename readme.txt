@@ -2,8 +2,8 @@
 Contributors: eugenbobrowski
 Tags: comments, spam, antispam, anti-spam, anti spam, comment spam, spam comments
 Requires at least: 3.2
-Tested up to: 4.5
-Stable tag: 1.0
+Tested up to: 4.5.2
+Stable tag: 1.1
 License: GPLv2 or later
 
 Antispam check the robots by behavior.
@@ -23,6 +23,11 @@ Upload the Antispam plugin to your blog, Activate it, then use it.
 1, 2, 3: You're done!
 
 == Changelog ==
+
+= 1.1 =
+*Release Date - 11rd May, 2016*
+
+* Use md5 hash of ABSPATH as a name of real comment field.
 
 = 1.0 =
 *Release Date - 23rd April, 2016*

@@ -8,7 +8,7 @@ Plugin Name: Antispam
 Plugin URI: http://wordpress.org/plugins/antispam/
 Description: Antispam hack form comment form
 Author: Eugen Bobrowski
-Version: 1.0
+Version: 1.1
 Author URI: http://atf.li/
 */
 
