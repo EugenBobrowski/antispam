@@ -17,7 +17,6 @@ if (!defined('ABSPATH')) exit;
 if (is_admin()) {
     class Antispam_Admin
     {
-
         protected static $instance;
 
         private function __construct()
@@ -37,18 +36,26 @@ if (is_admin()) {
 
         public function show_spam_count($wp_admin_bar)
         {
-            $args = array(
+            $wp_admin_bar->add_node(array(
                 "id" => "antispam-plugin-counter",
                 "title" => "Antispam: " . get_option('spams_detected', 0),
-            );
-            $wp_admin_bar->add_node($args);
+            ));
+
+            $wp_admin_bar->add_node(array(
+                'id' => 'antispam-github',
+                'href' => 'https://github.com/EugenBobrowski/antispam/issues',
+                "title" => 'Create Issue on GitHub',
+                "parent" => "antispam-plugin-counter",
+            ));
+
+
         }
 
         public function style()
         {
             ?>
             <style>
-                #wp-admin-bar-antispam-plugin-counter .ab-item:before {
+                #wp-admin-bar-antispam-plugin-counter > .ab-item:before {
                     content: "\f332";
                     top: 4px;
                 }
@@ -56,7 +63,8 @@ if (is_admin()) {
         }
     }
 
-    Antispam_Admin::get_instance();
+    if (apply_filters('antispam_counter', true))
+        Antispam_Admin::get_instance();
 } else {
     class Antispam
     {
@@ -66,7 +74,7 @@ if (is_admin()) {
 
         private function __construct()
         {
-            
+
 //		    add_filter('pre_comment_on_post', array($this, 'verify_spam'));
 
             $this->nonce = hash('md5', ABSPATH);
