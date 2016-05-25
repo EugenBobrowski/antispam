@@ -127,10 +127,10 @@ if (is_admin()) {
             if (isset($_POST['comment'])) {
                 $spam_test_field = trim($_POST['comment']);
                 if (!empty($spam_test_field)) {
-                    $spam_detected = get_option('spams_detected', 1);
+                    $spam_detected = get_option('spams_detected', 0);
                     $spam_detected++;
                     update_option('spams_detected', $spam_detected);
-                    return new WP_Error('comment_spam', __('Sorry, comments for bots are closed.'), 403);
+                    wp_die(__('Sorry, comments for bots are closed.'));
                 }
                 $comment_content = trim($_POST[$this->nonce]);
                 $_POST['comment'] = $comment_content;
