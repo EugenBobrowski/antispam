@@ -24,6 +24,8 @@ Upload the Antispam plugin to your blog, Activate it, then use it.
 
 1, 2, 3: You're done!
 
+
+
 == Changelog ==
 
 = 1.2 =
