@@ -8,7 +8,7 @@ Plugin Name: Antispam
 Plugin URI: http://wordpress.org/plugins/antispam/
 Description: Antispam hack form comment form
 Author: Eugen Bobrowski
-Version: 1.2
+Version: 1.3
 Author URI: http://atf.li/
 */
 
@@ -37,15 +37,22 @@ if (is_admin()) {
         public function show_spam_count($wp_admin_bar)
         {
             $wp_admin_bar->add_node(array(
+                "id" => "antispam-plugin",
+                "title" => "Antispam:",
+                "parent" => "comments",
+            ));
+
+            $wp_admin_bar->add_node(array(
                 "id" => "antispam-plugin-counter",
-                "title" => "Antispam: " . get_option('spams_detected', 0),
+                "title" =>  get_option('spams_detected', 0) . ' rejected',
+                "parent" => "antispam-plugin",
             ));
 
             $wp_admin_bar->add_node(array(
                 'id' => 'antispam-github',
                 'href' => 'https://github.com/EugenBobrowski/antispam/issues',
                 "title" => 'Create Issue on GitHub',
-                "parent" => "antispam-plugin-counter",
+                "parent" => "antispam-plugin",
             ));
 
 
@@ -55,8 +62,8 @@ if (is_admin()) {
         {
             ?>
             <style>
-                #wp-admin-bar-antispam-plugin-counter > .ab-item:before {
-                    content: "\f332";
+                #wp-admin-bar-antispam-plugin > .ab-item:before {
+                    content: "\f332" !important;
                     top: 4px;
                 }
             </style><?php
