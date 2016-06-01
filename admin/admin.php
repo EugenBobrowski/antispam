@@ -34,6 +34,12 @@ class Antispam_Admin
 
     public function view()
     {
+        global $wpdb;
+        $table = $wpdb->prefix . 'comments_antispam_log';
+
+        $sql = "SELECT COUNT(`spam_ID`), DATE(`spam_date`) FROM {$table} GROUP BY DATE(`spam_date`);";
+        var_dump($wpdb->get_results($sql));
+
         ?>
         <div class="wrap">
 
