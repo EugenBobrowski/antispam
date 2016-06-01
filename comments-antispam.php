@@ -6,7 +6,7 @@
 /*
 Plugin Name: Antispam
 Plugin URI: http://wordpress.org/plugins/antispam/
-Description: Antispam hack form comment form
+Description: Anti-spam check the robots by behavior. No captcha. Antispam let robots do so as a human can't do.
 Author: Eugen Bobrowski
 Version: 1.3
 Author URI: http://atf.li/
@@ -43,6 +43,8 @@ if (is_admin()) {
                     'method' => 'add',
                     //parent to copy and hide
                     'parent' => '.comment-form-comment',
+                    'author' => 'author',
+                    'email' => 'email',
                 ),
             ));
 
@@ -152,7 +154,7 @@ if (is_admin()) {
                 ||
                 ('add' == $field['method'] && !empty($_POST['comment']))
                 ) {
-                    $this->die_die_die();
+                    $this->die_die_die($field);
 
                 } elseif (isset($_POST[$field['ha']])) {
                     $_POST['comment'] = $_POST[$field['ha']];
@@ -163,14 +165,39 @@ if (is_admin()) {
             return $commentdata;
         }
 
-        public function die_die_die()
+        public function log_spam($field = array()) {
+
+            $spamdata = array(
+                'spam_date' => current_time( 'mysql' ),
+                'spam_IP' => '',
+                'spam_email' => '',
+                'spam_author' => '',
+            );
+
+
+            $spamdata['spam_IP'] = $_SERVER['REMOTE_ADDR'];
+            $spamdata['spam_IP'] = preg_replace( '/[^0-9a-fA-F:., ]/', '', $spamdata['spam_IP'] );
+
+            if (isset($field['author']) && isset($_POST[$field['author']])) $spamdata['spam_author'] = sanitize_text_field($_POST[$field['author']]);
+            elseif (isset($_POST['author'])) $spamdata['spam_author'] = sanitize_text_field($_POST['author']);
+            if (isset($field['email']) && isset($_POST[$field['email']])) $spamdata['spam_email'] = sanitize_text_field($_POST[$field['email']]);
+            elseif (isset($_POST['email'])) $spamdata['spam_email'] = sanitize_text_field($_POST['email']);
+
+            global $wpdb;
+            $table = $wpdb->prefix . 'comments_antispam_log';
+
+            $wpdb->insert($table, $spamdata);
+
+        }
+
+        public function die_die_die($field)
         {
+            $this->log_spam($field);
             $spam_detected = get_option('spams_detected', 0);
             $spam_detected++;
             update_option('spams_detected', $spam_detected);
             wp_die(__('Sorry, comments for bots are closed.'));
         }
-
 
     }
 
