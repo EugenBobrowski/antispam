@@ -24,7 +24,9 @@ Upload the Antispam plugin to your blog, Activate it, then use it.
 
 1, 2, 3: You're done!
 
+== Screenshots ==
 
+1. Spam comment is rejected
 
 == Changelog ==
 

@@ -23,16 +23,16 @@ if (is_admin()) {
     {
 
         protected static $instance;
+        private $secret;
         private $nonce;
         private $localize_object;
         private $fields;
 
         private function __construct()
         {
+            $this->secret = apply_filters('antispam_s', ABSPATH);
 
-//		    add_filter('pre_comment_on_post', array($this, 'verify_spam'));
-
-            $this->nonce = hash('md5', ABSPATH);
+            $this->nonce = hash('md5', $this->secret);
 
             $this->localize_object = 'veritas';
 
@@ -41,18 +41,27 @@ if (is_admin()) {
                 'comment' => array(
                     //protect method (replace | add )
                     'method' => 'add',
+                    'request_method' => 'post',
                     //parent to copy and hide
                     'parent' => '.comment-form-comment',
                     'author' => 'author',
                     'email' => 'email',
                 ),
+                's' => array(
+                    //protect method (replace | add )
+                    'method' => 'add',
+                    'request_method' => 'get',
+                    //parent to copy and hide
+                    'parent' => 'label',
+                ),
+
             ));
 
             foreach ($this->fields as $name => $settings) {
                 $this->fields[$name]['ha'] = hash('md5', ABSPATH . $name);
             }
-
-            add_filter('init', array($this, 'verify_spam'));
+//		    add_filter('pre_comment_on_post', array($this, 'verify_spam'));
+            add_filter('init', array($this, 'verify_spam'), 1);
             add_action('wp_print_scripts', array($this, 'localize'));
             add_filter('print_footer_scripts', array($this, 'javascript'));
             return true;
@@ -148,16 +157,21 @@ if (is_admin()) {
 
         public function verify_spam($commentdata)
         {
+
             foreach ($this->fields as $name => $field) {
                 if (
-                ('replace' == $field['method'] && isset($_POST['comment']) && !isset($_POST[$field['ha']]))
+                (('replace' == $field['method'] && isset($_REQUEST[$name]) && !isset($_REQUEST[$field['ha']]))
                 ||
-                ('add' == $field['method'] && !empty($_POST['comment']))
+                ('add' == $field['method'] && !empty($_REQUEST[$name])))
+                && !isset($_COOKIE['antispam_verified'])
                 ) {
                     $this->die_die_die($field);
-
-                } elseif (isset($_POST[$field['ha']])) {
-                    $_POST['comment'] = $_POST[$field['ha']];
+                } elseif (isset($_REQUEST[$field['ha']]) && 'post' == $field['request_method']) {
+                    $_POST[$name] = $_POST[$field['ha']];
+                } elseif (isset($_REQUEST[$field['ha']]) && 'get' == $field['request_method']) {
+                    setcookie('antispam_verified', 'asd', time() + 60, '/');
+                    $_GET[$name] = $_GET[$field['ha']];
+                    wp_redirect(site_url('?s='.$_GET[$field['ha']])); exit;
                 }
             }
 
@@ -180,6 +194,7 @@ if (is_admin()) {
 
             if (isset($field['author']) && isset($_POST[$field['author']])) $spamdata['spam_author'] = sanitize_text_field($_POST[$field['author']]);
             elseif (isset($_POST['author'])) $spamdata['spam_author'] = sanitize_text_field($_POST['author']);
+
             if (isset($field['email']) && isset($_POST[$field['email']])) $spamdata['spam_email'] = sanitize_text_field($_POST[$field['email']]);
             elseif (isset($_POST['email'])) $spamdata['spam_email'] = sanitize_text_field($_POST['email']);
 
