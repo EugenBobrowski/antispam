@@ -54,4 +54,26 @@ window.onload = function () {
         });
 
     chart.render();
-}
+};
+
+(function ($) {
+
+    var data = {};
+
+    $(document).ready(function () {
+        console.log(antispam_data);
+        data.rejected = [];
+        var a = antispam_data.data;
+        var first = a.shift();
+        var last = a.pop();
+
+        console.log(first, last, a);
+
+
+
+
+
+    });
+
+
+})(jQuery);
