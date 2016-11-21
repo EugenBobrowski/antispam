@@ -34,11 +34,6 @@ class Antispam_Admin
 
     public function view()
     {
-        global $wpdb;
-        $table = $wpdb->prefix . 'comments_antispam_log';
-
-        $sql = "SELECT COUNT(`spam_ID`), DATE(`spam_date`) FROM {$table} GROUP BY DATE(`spam_date`, `spam_manual`);";
-        var_dump($wpdb->get_results($sql));
 
         ?>
         <div class="wrap">
@@ -61,7 +56,24 @@ class Antispam_Admin
         if (strpos('tools_page_antispam-statistic', $prefix) === false) return;
         wp_enqueue_script('canvasjs', plugin_dir_url(__FILE__) . 'canvasjs.min.js?plugin=' . $prefix);
         wp_enqueue_script('antispam-admin', plugin_dir_url(__FILE__) . 'antispam.js?plugin=' . $prefix, array('jquery', 'canvasjs'));
+        wp_localize_script('antispam-admin', 'antispam_data', array('data' => $this->get_data()));
     }
+
+    public function get_data () {
+
+        global $wpdb;
+
+        $table = $wpdb->prefix . 'comments_antispam_log';
+
+        $sql = "SELECT COUNT(`spam_ID`) as s_count, DATE(`spam_date`) AS s_date FROM {$table} GROUP BY s_date ORDER BY s_date ASC ;";
+
+        $res = $wpdb->get_results($sql, ARRAY_A);
+
+        if (empty($res)) return array(array('s_count' => 0, 's_date' => date('Y-m-d')));
+
+        return $res;
+    }
+
 
     public function show_spam_count($wp_admin_bar)
     {
