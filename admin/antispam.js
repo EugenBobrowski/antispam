@@ -5,39 +5,41 @@
 
 (function ($) {
 
+    var antispamchart = {};
 
-    window.onload = function () {
+    antispamchart.chart = function () {
 
-        var points1 = preparedata(antispam_data.data);
+        var points1 = antispamchart.preparedata(antispam_data.data);
 
         var chart = new CanvasJS.Chart("chartContainer",
             {
                 animationEnabled: true,
-                title:{
+                title: {
                     text: "Antispam stistic"
                 },
                 data: [
                     {
+                        legendText: "Spam Rejected",
                         type: "spline", //change type to bar, line, area, pie, etc
                         showInLegend: true,
                         dataPoints: points1
                     }
-                    ,
-                    {
-                        type: "spline",
-                        showInLegend: true,
-                        dataPoints: [
-                            // { label: '1 may', y: 31 },
-                            // { label: '2 may', y: 25},
-                            // { label: '3 may', y: 80 },
-                            // { label: '4 may', y: 52 },
-                            // { label: '5 may', y: 65 },
-                            // { label: '6 may', y: 56 },
-                            // { label: '7 may', y: 34 },
-                            { label: '8 may', y: 0 },
-                            { label: '9 may', y: 0 }
-                        ]
-                    }
+                    // ,
+                    // {
+                    //     type: "spline",
+                    //     showInLegend: true,
+                    //     dataPoints: [
+                    //         // { label: '1 may', y: 31 },
+                    //         // { label: '2 may', y: 25},
+                    //         // { label: '3 may', y: 80 },
+                    //         // { label: '4 may', y: 52 },
+                    //         // { label: '5 may', y: 65 },
+                    //         // { label: '6 may', y: 56 },
+                    //         // { label: '7 may', y: 34 },
+                    //         {label: '8 may', y: 0},
+                    //         {label: '9 may', y: 0}
+                    //     ]
+                    // }
                 ],
                 legend: {
                     cursor: "pointer",
@@ -55,10 +57,7 @@
         chart.render();
     };
 
-    var chart = {};
-
-    var preparedata = function (a) {
-
+    antispamchart.preparedata = function (a) {
         var first = {};
         first.el = a.shift();
         first.date = Date.parse(first.el.s_date);
@@ -67,32 +66,45 @@
         last.date = Date.parse(last.el.s_date);
         var timeline = [];
         var current = {};
-        console.log(first.date, last.date, a);
 
-        current.date = new Date (first.date);
+        current.date = new Date(first.date);
 
-        timeline.push({label: current.date.toLocaleString("en-US", {
-            month: 'short',
-            day: 'numeric'
-        }), y: parseInt(first.el.s_count)});
+        timeline.push(antispamchart.point(current.date, first.el.s_count));
+
+        antispamchart.getPoints(a);
 
         current.timestamp = first.date;
         while (current.timestamp < last.date) {
             current.timestamp += 3600 * 24 * 1000;
-            current.date = new Date (current.timestamp);
-            timeline.push({
-                label: current.date.toLocaleString("en-US", {
-                month: 'short',
-                day: 'numeric'
-            }), y: 0});
 
+            if (undefined == antispamchart.points[current.timestamp]) current.val = 0;
+            else current.val = antispamchart.points[current.timestamp];
+
+            timeline.push(antispamchart.point(current.timestamp, current.val));
         }
-
-        console.log(timeline);
 
         return timeline;
 
-    }
+    };
 
+    antispamchart.point = function (timestamp, value) {
+        var date = new Date(timestamp);
+
+        return {
+            label: date.toLocaleString("en-US", {
+                month: 'short',
+                day: 'numeric'
+            }), y: parseInt(value)
+        }
+    };
+
+    antispamchart.getPoints = function (a) {
+        antispamchart.points = {};
+        a.forEach(function(item, i, arr) {
+            antispamchart.points[Date.parse(item.s_date)] = parseInt(item.s_count);
+        });
+    };
+
+    window.onload = antispamchart.chart;
 
 })(jQuery);
