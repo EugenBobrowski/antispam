@@ -9,7 +9,7 @@ class Antispam_Activator
      *
      * @since    1.0.0
      */
-    public static function activate()
+    public static function db_check()
     {
         $version = get_option('antispam_db_version');
 

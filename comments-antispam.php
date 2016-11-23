@@ -8,7 +8,7 @@ Plugin Name: Antispam
 Plugin URI: http://wordpress.org/plugins/antispam/
 Description: Anti-spam check the robots by behavior. No captcha. Antispam let robots do so as a human can't do.
 Author: Eugen Bobrowski
-Version: 1.3
+Version: 1.4
 Author URI: http://atf.li/
 */
 
@@ -17,7 +17,8 @@ if (!defined('ABSPATH')) exit;
 if (is_admin()) {
     include_once 'admin/admin.php';
     include_once 'admin/install.php';
-    register_activation_hook( __FILE__, array('Antispam_Activator', 'activate') );
+    add_action('plugins_loaded', array('Antispam_Activator', 'db_check'));
+    register_activation_hook( __FILE__, array('Antispam_Activator', 'db_check') );
 } else {
     class Antispam
     {
