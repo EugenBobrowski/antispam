@@ -2,6 +2,8 @@
  * Created by eugen on 5/31/16.
  */
 
+'use strict';
+
 
 (function ($) {
 
@@ -58,12 +60,26 @@
     };
 
     antispamchart.preparedata = function (a) {
-        var first = {};
-        first.el = a.shift();
-        first.date = Date.parse(first.el.s_date);
-        var last = {};
-        last.el = a.pop();
-        last.date = Date.parse(last.el.s_date);
+
+        var first = {}, last = {};
+
+        if (a.length != 0) {
+            first.el   = a.shift();
+            first.date = Date.parse(first.el.s_date);
+        } else {
+            first.el.s_count = 0;
+            first.date = new Date();
+        }
+
+        if (a.length != 0) {
+            last.el = a.pop(); a.push(last.el);
+            last.date = Date.parse(last.el.s_date);
+
+        } else {
+            last.el   = first.el;
+            last.date = first.date;
+        }
+
         var timeline = [];
         var current = {};
 
@@ -106,5 +122,6 @@
     };
 
     window.onload = antispamchart.chart;
+
 
 })(jQuery);

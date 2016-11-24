@@ -25,12 +25,12 @@ CREATE TABLE {$table} (
 	  `spam_email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  `spam_author` tinytext COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `spam_manual` int(11) NOT NULL DEFAULT 0,
-      UNIQUE KEY (spam_ID)
+      UNIQUE KEY (`spam_ID`)
 	);
 	";
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
 
-        update_option('si_db_version', 2);
+        update_option('antispam_db_version', 2);
     }
 }
