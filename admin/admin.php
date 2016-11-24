@@ -41,11 +41,10 @@ class Antispam_Admin
             <h1>
                 <?php echo get_admin_page_title(); ?>
             </h1>
-            <p></p>
-            <div id="chartContainer" class="antispam-chart" style="height: 300px; width: 100%;">
+            <h2 style="color: #777"><span style="font-size: 3.3em"><?php echo get_option('spams_detected', 0); ?></span> spam comments rejected</h2>
+            <div id="chartContainer" class="antispam-chart" style="height: 300px; width: 100%;"></div>
 
-            </div>
-
+            <p style="text-align: right"><a class="button button-small" href="https://github.com/EugenBobrowski/antispam/issues">Create Issue on GitHub</a></p>
         </div>
 
 
@@ -80,7 +79,8 @@ class Antispam_Admin
     {
         $wp_admin_bar->add_node(array(
             "id" => "antispam-plugin",
-            "title" => "Antispam:",
+            "title" => "Antispam ",
+            'href' => admin_url('tools.php?page=antispam-statistic'),
             "parent" => "comments",
         ));
 
