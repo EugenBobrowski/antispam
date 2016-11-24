@@ -27,6 +27,7 @@ Upload the Antispam plugin to your blog, Activate it, then use it.
 == Screenshots ==
 
 1. Spam comment is rejected
+2. Antispam statistic in admin bar and on the page
 
 == Changelog ==
 

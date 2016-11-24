@@ -25,7 +25,7 @@ class Antispam_Admin
     {
         add_submenu_page(
             'tools.php',
-            'Antispam statistic and settings',
+            'Antispam statistic',
             'Antispam',
             'manage_options',
             'antispam-statistic',
@@ -41,6 +41,7 @@ class Antispam_Admin
             <h1>
                 <?php echo get_admin_page_title(); ?>
             </h1>
+            <p></p>
             <div id="chartContainer" class="antispam-chart" style="height: 300px; width: 100%;">
 
             </div>
