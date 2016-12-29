@@ -8,8 +8,8 @@ Plugin Name: Antispam
 Plugin URI: http://wordpress.org/plugins/antispam/
 Description: Anti-spam check the robots by behavior. No captcha. Antispam let robots do so as a human can't do.
 Author: Eugen Bobrowski
-Version: 1.4
-Author URI: http://atf.li/
+Version: 1.5
+Author URI: http://bobrowski.ru/
 */
 
 if (!defined('ABSPATH')) exit;
@@ -48,13 +48,13 @@ if (is_admin()) {
                     'author' => 'author',
                     'email' => 'email',
                 ),
-                's' => array(
-                    //protect method (replace | add )
-                    'method' => 'add',
-                    'request_method' => 'get',
-                    //parent to copy and hide
-                    'parent' => 'label',
-                ),
+//                's' => array(
+//                    //protect method (replace | add )
+//                    'method' => 'add',
+//                    'request_method' => 'get',
+//                    //parent to copy and hide
+//                    'parent' => 'label',
+//                ),
 
             ));
 
@@ -217,5 +217,13 @@ if (is_admin()) {
 
     }
 
-    Antispam::get_instance();
+    add_action('plugins_loaded', array('Antispam', 'get_instance'));
 }
+
+// Example
+
+//add_filter('antispam_fields', 'antispam_disable_search');
+//function antispam_disable_search ($fields) {
+// if (isset($fields['s'])) unset($fields['s']);
+// return $fields;
+//}

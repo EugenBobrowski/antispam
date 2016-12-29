@@ -3,7 +3,7 @@ Contributors: eugenbobrowski
 Tags: comments, spam, antispam, anti-spam, anti spam, comment spam, spam comments
 Requires at least: 3.2
 Tested up to: 4.6.1
-Stable tag: 1.4
+Stable tag: 1.5
 License: GPLv2 or later
 
 Anti-spam check the robots by behavior. No captcha. Antispam let robots do so as a human can't do.
@@ -31,6 +31,17 @@ Upload the Antispam plugin to your blog, Activate it, then use it.
 2. Antispam statistic page
 
 == Changelog ==
+
+= 1.5 =
+*Release Date - 29th December, 2016*
+
+* Disable search antispam
+* Fix antispam fields filter applying
+
+= 1.4 =
+*Release Date - 24th November, 2016*
+
+* Add statistic
 
 = 1.3 =
 *Release Date - 30rd May, 2016*
