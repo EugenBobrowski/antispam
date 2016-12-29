@@ -2,8 +2,8 @@
 Contributors: eugenbobrowski
 Tags: comments, spam, antispam, anti-spam, anti spam, comment spam, spam comments
 Requires at least: 3.2
-Tested up to: 4.5.2
-Stable tag: 1.3
+Tested up to: 4.6.1
+Stable tag: 1.4
 License: GPLv2 or later
 
 Anti-spam check the robots by behavior. No captcha. Antispam let robots do so as a human can't do.
@@ -12,9 +12,10 @@ Anti-spam check the robots by behavior. No captcha. Antispam let robots do so as
 
 Antispam let robots do so as a human can't do.
 
-Features include:
+= Features include: =
 
 * No captcha
+* Statistic
 
 GitHub: https://github.com/EugenBobrowski/antispam
 
@@ -24,7 +25,10 @@ Upload the Antispam plugin to your blog, Activate it, then use it.
 
 1, 2, 3: You're done!
 
+== Screenshots ==
 
+1. Spam comment is rejected
+2. Antispam statistic page
 
 == Changelog ==
 
