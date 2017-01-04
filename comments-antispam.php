@@ -6,87 +6,34 @@
 /*
 Plugin Name: Antispam
 Plugin URI: http://wordpress.org/plugins/antispam/
-Description: Antispam hack form comment form
+Description: Anti-spam check the robots by behavior. No captcha. Antispam let robots do so as a human can't do.
 Author: Eugen Bobrowski
-Version: 1.3
-Author URI: http://atf.li/
+Version: 1.5
+Author URI: http://bobrowski.ru/
 */
 
 if (!defined('ABSPATH')) exit;
 
 if (is_admin()) {
-    class Antispam_Admin
-    {
-        protected static $instance;
-
-        private function __construct()
-        {
-            add_action('admin_bar_menu', array($this, 'show_spam_count'), 99);
-            add_action('admin_print_styles', array($this, 'style'));
-            return true;
-        }
-
-        public static function get_instance()
-        {
-            if (null === self::$instance) {
-                self::$instance = new self();
-            }
-            return self::$instance;
-        }
-
-        public function show_spam_count($wp_admin_bar)
-        {
-            $wp_admin_bar->add_node(array(
-                "id" => "antispam-plugin",
-                "title" => "Antispam:",
-                "parent" => "comments",
-            ));
-
-            $wp_admin_bar->add_node(array(
-                "id" => "antispam-plugin-counter",
-                "title" =>  get_option('spams_detected', 0) . ' rejected',
-                "parent" => "antispam-plugin",
-            ));
-
-            $wp_admin_bar->add_node(array(
-                'id' => 'antispam-github',
-                'href' => 'https://github.com/EugenBobrowski/antispam/issues',
-                "title" => 'Create Issue on GitHub',
-                "parent" => "antispam-plugin",
-            ));
-
-
-        }
-
-        public function style()
-        {
-            ?>
-            <style>
-                #wp-admin-bar-antispam-plugin > .ab-item:before {
-                    content: "\f332" !important;
-                    top: 4px;
-                }
-            </style><?php
-        }
-    }
-
-    if (apply_filters('antispam_counter', true))
-        Antispam_Admin::get_instance();
+    include_once 'admin/admin.php';
+    include_once 'admin/install.php';
+    add_action('plugins_loaded', array('Antispam_Activator', 'db_check'));
+    register_activation_hook( __FILE__, array('Antispam_Activator', 'db_check') );
 } else {
     class Antispam
     {
 
         protected static $instance;
+        private $secret;
         private $nonce;
         private $localize_object;
         private $fields;
 
         private function __construct()
         {
+            $this->secret = apply_filters('antispam_s', ABSPATH);
 
-//		    add_filter('pre_comment_on_post', array($this, 'verify_spam'));
-
-            $this->nonce = hash('md5', ABSPATH);
+            $this->nonce = hash('md5', $this->secret);
 
             $this->localize_object = 'veritas';
 
@@ -95,16 +42,27 @@ if (is_admin()) {
                 'comment' => array(
                     //protect method (replace | add )
                     'method' => 'add',
+                    'request_method' => 'post',
                     //parent to copy and hide
                     'parent' => '.comment-form-comment',
+                    'author' => 'author',
+                    'email' => 'email',
                 ),
+//                's' => array(
+//                    //protect method (replace | add )
+//                    'method' => 'add',
+//                    'request_method' => 'get',
+//                    //parent to copy and hide
+//                    'parent' => 'label',
+//                ),
+
             ));
 
             foreach ($this->fields as $name => $settings) {
                 $this->fields[$name]['ha'] = hash('md5', ABSPATH . $name);
             }
-
-            add_filter('init', array($this, 'verify_spam'));
+//		    add_filter('pre_comment_on_post', array($this, 'verify_spam'));
+            add_filter('init', array($this, 'verify_spam'), 1);
             add_action('wp_print_scripts', array($this, 'localize'));
             add_filter('print_footer_scripts', array($this, 'javascript'));
             return true;
@@ -127,8 +85,6 @@ if (is_admin()) {
 
         public function localize()
         {
-
-
             wp_enqueue_script('jquery');
             wp_localize_script('jquery', $this->localize_object, $this->fields);
         }
@@ -202,16 +158,21 @@ if (is_admin()) {
 
         public function verify_spam($commentdata)
         {
+
             foreach ($this->fields as $name => $field) {
                 if (
-                ('replace' == $field['method'] && isset($_POST['comment']) && !isset($_POST[$field['ha']]))
+                (('replace' == $field['method'] && isset($_REQUEST[$name]) && !isset($_REQUEST[$field['ha']]))
                 ||
-                ('add' == $field['method'] && !empty($_POST['comment']))
+                ('add' == $field['method'] && !empty($_REQUEST[$name])))
+                && !isset($_COOKIE['antispam_verified'])
                 ) {
-                    $this->die_die_die();
-
-                } elseif (isset($_POST[$field['ha']])) {
-                    $_POST['comment'] = $_POST[$field['ha']];
+                    $this->die_die_die($field);
+                } elseif (isset($_REQUEST[$field['ha']]) && 'post' == $field['request_method']) {
+                    $_POST[$name] = $_POST[$field['ha']];
+                } elseif (isset($_REQUEST[$field['ha']]) && 'get' == $field['request_method']) {
+                    setcookie('antispam_verified', 'asd', time() + 60, '/');
+                    $_GET[$name] = $_GET[$field['ha']];
+                    wp_redirect(site_url('?s='.$_GET[$field['ha']])); exit;
                 }
             }
 
@@ -219,16 +180,50 @@ if (is_admin()) {
             return $commentdata;
         }
 
-        public function die_die_die()
+        public function log_spam($field = array()) {
+
+            $spamdata = array(
+                'spam_date' => current_time( 'mysql' ),
+                'spam_IP' => '',
+                'spam_email' => '',
+                'spam_author' => '',
+            );
+
+
+            $spamdata['spam_IP'] = $_SERVER['REMOTE_ADDR'];
+            $spamdata['spam_IP'] = preg_replace( '/[^0-9a-fA-F:., ]/', '', $spamdata['spam_IP'] );
+
+            if (isset($field['author']) && isset($_POST[$field['author']])) $spamdata['spam_author'] = sanitize_text_field($_POST[$field['author']]);
+            elseif (isset($_POST['author'])) $spamdata['spam_author'] = sanitize_text_field($_POST['author']);
+
+            if (isset($field['email']) && isset($_POST[$field['email']])) $spamdata['spam_email'] = sanitize_text_field($_POST[$field['email']]);
+            elseif (isset($_POST['email'])) $spamdata['spam_email'] = sanitize_text_field($_POST['email']);
+
+            global $wpdb;
+            $table = $wpdb->prefix . 'comments_antispam_log';
+
+            $wpdb->insert($table, $spamdata);
+
+        }
+
+        public function die_die_die($field)
         {
+            $this->log_spam($field);
             $spam_detected = get_option('spams_detected', 0);
             $spam_detected++;
             update_option('spams_detected', $spam_detected);
             wp_die(__('Sorry, comments for bots are closed.'));
         }
 
-
     }
 
-    Antispam::get_instance();
+    add_action('plugins_loaded', array('Antispam', 'get_instance'));
 }
+
+// Example
+
+//add_filter('antispam_fields', 'antispam_disable_search');
+//function antispam_disable_search ($fields) {
+// if (isset($fields['s'])) unset($fields['s']);
+// return $fields;
+//}
