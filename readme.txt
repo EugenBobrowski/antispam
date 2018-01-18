@@ -2,7 +2,7 @@
 Contributors: eugenbobrowski
 Tags: comments, spam, antispam, anti-spam, anti spam, comment spam, spam comments
 Requires at least: 3.2
-Tested up to: 4.6.1
+Tested up to: 4.7
 Stable tag: 1.5
 License: GPLv2 or later
 
@@ -17,6 +17,14 @@ Antispam let robots do so as a human can't do.
 * No captcha
 * Statistic
 
+= Incompatible with: =
+
+* Disqus
+* Jetpack Comments
+* AJAX Comment Form
+* bbPress
+
+
 GitHub: https://github.com/EugenBobrowski/antispam
 
 == Installation ==
@@ -24,6 +32,27 @@ GitHub: https://github.com/EugenBobrowski/antispam
 Upload the Antispam plugin to your blog, Activate it, then use it.
 
 1, 2, 3: You're done!
+
+== Frequently Asked Questions ==
+
+= Can it protect other of comment fields too? =
+
+Yes! You can.
+```
+add_filter('antispam_fields', 'antispam_add_fields');
+function antispam_add_fields ($fields) {
+    $fields['email_field'] = array(
+        //protect method (replace | add )
+        'method' => 'add',
+        'request_method' => 'post',
+        //parent to copy and hide
+        'parent' => '.subscribtion-form-email',
+        'author' => 'author',
+        'email' => 'email',
+    );
+ return $fields;
+}
+```
 
 == Screenshots ==
 
