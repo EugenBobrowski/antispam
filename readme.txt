@@ -2,7 +2,7 @@
 Contributors: eugenbobrowski
 Tags: comments, spam, antispam, anti-spam, anti spam, comment spam, spam comments
 Requires at least: 3.2
-Tested up to: 4.7
+Tested up to: 4.9
 Stable tag: 1.5
 License: GPLv2 or later
 
@@ -60,6 +60,11 @@ function antispam_add_fields ($fields) {
 2. Antispam statistic page
 
 == Changelog ==
+
+= 1.6 =
+*Release Date - 29th December, 2016*
+
+* Add repeat antispam protection called from other places
 
 = 1.5 =
 *Release Date - 29th December, 2016*

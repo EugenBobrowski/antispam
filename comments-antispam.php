@@ -61,7 +61,7 @@ if (is_admin()) {
             foreach ($this->fields as $name => $settings) {
                 $this->fields[$name]['ha'] = hash('md5', ABSPATH . $name);
             }
-//		    add_filter('pre_comment_on_post', array($this, 'verify_spam'));
+		    add_filter('pre_comment_on_post', array($this, 'verify_spam'));
             add_filter('init', array($this, 'verify_spam'), 1);
             add_action('wp_print_scripts', array($this, 'localize'));
             add_filter('print_footer_scripts', array($this, 'javascript'));
@@ -86,7 +86,9 @@ if (is_admin()) {
         public function localize()
         {
             wp_enqueue_script('jquery');
-            wp_localize_script('jquery', $this->localize_object, $this->fields);
+            wp_localize_script('jquery', $this->localize_object, array(
+                    'fields' => $this->fields
+            ));
         }
 
         public function javascript()
@@ -96,42 +98,46 @@ if (is_admin()) {
             ?>
             <script>
                 (function ($) {
-                    $(document).ready(function () {
 
-                        var someFunction = function (e) {
-                            for (var key in veritas) {
-                                var $field = $('[name="' + key + '"]');
-                                if ($field.length < 1) continue;
+                    veritas.init = function (e) {
+                        for (var key in veritas.fields) {
+                            var $field = $('[name="' + key + '"]');
+                            if ($field.length < 1) continue;
 
-                                $field.each(function () {
+                            $field.each(function () {
 
-                                    var $this = $(this);
+                                var $this = $(this);
 
-                                    if (veritas[key].method == 'replace') {
+                                if ($this.hasClass('zahyscheno')) return true;
 
-                                        $this.focus(function(){
-                                            $("label[for='" + $this.attr('id') + "']").attr('for', veritas[key].ha);
-                                            $this.attr('id', veritas[key].ha).attr('name', veritas[key].ha);
-                                        });
+                                if (veritas.fields[key].method == 'replace') {
 
-                                    } else if (veritas[key].method =    = 'add') {
+                                    $this.focus(function(){
+                                        $("label[for='" + $this.attr('id') + "']").attr('for', veritas.fields[key].ha);
+                                        $this.attr('id', veritas.fields[key].ha).attr('name', veritas.fields[key].ha);
+                                    });
 
-                                        var $parent = $this.parents(veritas[key].parent);
-                                        var $clone = $parent.clone();
+                                } else if (veritas.fields[key].method =    = 'add') {
+
+                                    var $parent = $this.parents(veritas.fields[key].parent);
+                                    var $clone = $parent.clone();
 
 
-                                        $clone.find("label[for='" + $this.attr('id') + "']").attr('for', veritas[key].ha);
-                                        $clone.find('[name="' + key + '"]').attr('id', veritas[key].ha).attr('name', veritas[key].ha);
-                                        $parent.after($clone).hide().find('[name="' + key + '"]').removeAttr('required');
+                                    $clone.find("label[for='" + $this.attr('id') + "']").attr('for', veritas.fields[key].ha);
+                                    $clone.find('[name="' + key + '"]').attr('id', veritas.fields[key].ha).attr('name', veritas.fields[key].ha);
+                                    $parent.after($clone).hide().find('[name="' + key + '"]').removeAttr('required');
 
-                                    }
+                                }
+                                $this.addClass('zahyscheno');
 
-                                })
+                            })
 
-                            }
-                        };
+                        }
+                    };
 
-                        setTimeout(someFunction, 1000);
+                    $(document).on('ready antispam-protect', function () {
+
+                        setTimeout(veritas.init, 1000);
 
                     });
                 })(jQuery);
