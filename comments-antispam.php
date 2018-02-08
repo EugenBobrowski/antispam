@@ -152,7 +152,7 @@ if (is_admin()) {
             );
             $js = str_replace(array_keys($x), $x, $js);
             echo($js);
-
+            return true;
         }
 
 
